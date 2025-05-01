@@ -28,10 +28,10 @@ import sys
 import subprocess
 from pathlib import Path
 import argparse
+import shutil
 
 def get_isat_root():
     """获取ISAT根目录"""
-    # 尝试从当前目录向上查找ISAT目录
     current_dir = Path.cwd()
     while current_dir != current_dir.parent:
         if (current_dir / "ISAT").exists():
@@ -39,30 +39,39 @@ def get_isat_root():
         current_dir = current_dir.parent
     raise FileNotFoundError("未找到ISAT目录")
 
-def update_icons_qrc(logo_path: str):
+def generate_icons(logo_path: str):
     """
-    更新ISAT的图标资源文件
+    生成所有需要的图标文件
     
     Args:
-        logo_path (str): logo图片的路径
+        logo_path (str): 原始logo图片的路径
     """
     if not os.path.exists(logo_path):
         raise FileNotFoundError(f"Logo文件不存在: {logo_path}")
         
-    current_dir = Path.cwd()
-    icons_dir = current_dir / "icons"
+    icons_dir = Path.cwd() / "icons"
     
-    # 复制logo文件到icons目录
-    import shutil
-    shutil.copy2(logo_path, icons_dir / "ISAT24_100.svg")
+    # 生成所有版本的图标
+    versions = ["11", "12", "13", "14", "21", "22", "23", "24"]
+    for version in versions:
+        # 复制到标准版本
+        shutil.copy2(logo_path, icons_dir / f"ISAT{version}.svg")
+        # 复制到100版本
+        shutil.copy2(logo_path, icons_dir / f"ISAT{version}_100.svg")
+        
+    print(f"已生成所有版本的图标文件")
 
+def update_icons_qrc():
+    """
+    更新ISAT的图标资源文件
+    """
     isat_root = get_isat_root()
     
     # 编译资源文件
     qrc_path = isat_root / "icons.qrc"
     try:
-        subprocess.run(["pyrcc5", str(qrc_path), "-o", str(icons_dir / "icons_rc.py")], check=True)
-        print(f"图标资源已更新: {icons_dir / 'ISAT24_100.svg'}")
+        subprocess.run(["pyrcc5", str(qrc_path), "-o", str(isat_root / "icons_rc.py")], check=True)
+        print(f"资源文件已编译")
     except subprocess.CalledProcessError as e:
         print(f"编译资源文件失败: {str(e)}")
 
@@ -117,7 +126,8 @@ def main():
         
     try:
         if args.logo:
-            update_icons_qrc(args.logo)
+            generate_icons(args.logo)
+            update_icons_qrc()
             
         if args.title:
             update_translation(args.title)

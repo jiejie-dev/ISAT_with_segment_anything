@@ -155,7 +155,7 @@ software:
   auto_save: false
   contour_mode: external
   create_mode_invisible_polygon: true
-  language: zh
+  language: en
   mask_alpha: 0.6
   real_time_area: false
   show_edge: true
