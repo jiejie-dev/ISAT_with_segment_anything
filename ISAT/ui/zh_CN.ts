@@ -1236,7 +1236,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="MainWindow.py" line="462"/>
         <source>ISAT</source>
-        <translation>ISAT 图片分割标注工具</translation>
+        <translation>芯率智能</translation>
     </message>
     <message>
         <location filename="MainWindow.py" line="463"/>
